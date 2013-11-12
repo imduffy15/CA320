@@ -5,26 +5,33 @@ myTree = Root 5 (Root 1 (Empty) (Root 3 Empty Empty))
 		(Root 7 Empty Empty)
 
 insert :: Ord a => a -> BinTree a -> BinTree a
-insert new Empty = Root new Empty Empty
-insert new (Root n left right)
-	| new > n  = Root n left (insert new right)
-	| new <= n  = Root n (insert new left) right 
+insert item Empty = Root item Empty Empty
+insert item (Root n left right)
+	| item < n  = Root n (insert item left) right
+	| otherwise  = Root n left (insert item right)
 
 maketree :: Ord a => [a] -> BinTree a
-maketree (x:[]) = Root x (Empty) (Empty)
+maketree [] = Empty
+maketree [x] = Root x (Empty) (Empty)
 maketree (x:xs) = insert x (maketree xs)
 
-preorder :: BinTree a -> [a]
-preorder n = preorder' n []
-	where preorder' Empty acc = acc
-	      preorder' (Root n left right) acc = n : (preorder' left (preorder' right acc))
+mpsort :: Ord a => [a] -> [a]
+mpsort x = inorder(maketree(x))
 
 inorder :: BinTree a -> [a]
-inorder n = inorder' n []
-	where inorder' Empty acc = acc
-	      inorder' (Root n left right) acc = inorder' left(n: (inorder' right acc))
+inorder Empty = []
+inorder (Root n left right) = inorder left ++ [n] ++ inorder right
 
-postorder :: BinTree a -> [a]
-postorder n = postorder' n []
-	where postorder' Empty acc = acc
-	      postorder' (Root n left right) acc = postorder' left (postorder' right acc) ++ [n]
+hoInsert :: Ord a => (a -> a -> Bool) -> a -> BinTree a -> BinTree a
+hoInsert op item Empty = Root item Empty Empty
+hoInsert op item (Root n left right)
+	| item `op` n = Root n (hoInsert op item left) right
+	| otherwise = Root n left (hoInsert op item right)
+
+hoMakeTree :: Ord a => (a -> a -> Bool) -> [a] -> BinTree a
+hoMakeTree _ [] = Empty
+hoMakeTree _ [x] = Root x (Empty) (Empty)
+hoMakeTree op (x:xs) = hoInsert op x (hoMakeTree op xs)
+
+hosort :: Ord a => (a -> a -> Bool) -> [a] -> [a]
+hosort op list = inorder(hoMakeTree op list)
