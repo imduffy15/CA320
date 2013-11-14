@@ -56,9 +56,9 @@ myElem x (y:ys)
 
 myDelete :: Eq a => a -> [a] -> [a]
 myDelete _ [] = []
-myDelete x (y:ys)
-	| x==y = myDelete x ys
-	| otherwise = y : myDelete x ys
+myDelete a (x:xs) 
+	| a == x = xs
+	| otherwise = x  : (myDelete a xs)
 
 myIntersect :: Eq a => [a] -> [a] -> [a]
 myIntersect _ [] = []
